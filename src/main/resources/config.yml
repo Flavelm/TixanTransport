@@ -1,0 +1,6 @@
+address: "type address"
+port: "type port"
+token: "global"
+server-name: "global"
+timeout: 1000
+proxy-name: "Proxy"

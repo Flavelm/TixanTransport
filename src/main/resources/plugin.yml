@@ -1,0 +1,10 @@
+name: TixanTransport
+version: '1.0'
+main: net.toeba.tixantransport.bukkit.TixanTransportBukkit
+api-version: 1.16
+authors: [ Zirolek ]
+commands:
+  transport:
+    description: "Kva"
+    usage: "transport <message>"
+    permission: tixan.transport
