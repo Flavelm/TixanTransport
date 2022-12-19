@@ -32,7 +32,7 @@ public class TixanTransportVelocity
     private Server Server;
     private Map<String, ClientHandler> Clients;
     //Queue<Map.Entry<SERVERNAME, MESSAGE>>
-    private static Queue<Map.Entry<String, String>> Commands = new Queue<>();
+    private static final Queue<Map.Entry<String, String>> Commands = new Queue<>();
     private List<String> Tokens;
     private final String ProxyName = "Proxy";
 
@@ -73,7 +73,7 @@ public class TixanTransportVelocity
     private final ClientHandlerInterface Interface = new ClientHandlerInterface()
     {
         @Override
-        public void OnMassage(String message, String serverName)
+        public void OnMessage(String message, String serverName)
         {
             Logger.info("Message: " + message + " ServerName: " + serverName);
             PEventManager.fire(new ServerRequestEvent(message, serverName, EventInterface));

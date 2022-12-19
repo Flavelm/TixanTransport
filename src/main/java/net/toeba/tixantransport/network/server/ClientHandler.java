@@ -42,7 +42,7 @@ public class ClientHandler implements Runnable
     }
 
     @Override
-    protected void finalize() throws Throwable
+    protected void finalize()
     {
         HandlerInterface.Log("Connection deleted!");
     }
@@ -89,7 +89,7 @@ public class ClientHandler implements Runnable
                         break;
                     case USER_PACKET:
                         HandlerInterface.Log("HandlerInterface.OnMassage(Message[2], Name);");
-                        HandlerInterface.OnMassage(ServerUtilities.GetMessageWithOutProtocol(message), Name);
+                        HandlerInterface.OnMessage(ServerUtilities.GetMessageWithOutProtocol(message), Name);
                         break;
                 }
             }
