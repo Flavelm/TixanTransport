@@ -45,5 +45,4 @@ For example: synchronization of configs, protection from entering the backend, c
 - [ ] Log
   - [X] Info
   - [ ] Debug
-  - [ ] Verbose
 
