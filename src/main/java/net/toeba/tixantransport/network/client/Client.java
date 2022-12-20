@@ -3,17 +3,15 @@ package net.toeba.tixantransport.network.client;
 import net.toeba.tixantransport.Constants;
 import net.toeba.tixantransport.ServerUtilities;
 import net.toeba.tixantransport.protocol.Protocol;
+import org.apache.logging.log4j.Level;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Client implements Runnable
 {
-    private Logger Logger;
     private final Thread ThisThead;
     private final ClientInterface Interface;
     private final SocketAddress Address;
@@ -22,12 +20,6 @@ public class Client implements Runnable
     private PrintWriter Printer;
     private BufferedReader Receiver;
     private boolean IsWaitingReadyResponse;
-
-    public Client(String ip, int port, String clientName, ClientInterface method, Logger logger)
-    {
-        this(ip, port, clientName, method);
-        Logger = logger;
-    }
 
     public Client(String ip, int port, String clientName, ClientInterface method)
     {
@@ -43,7 +35,7 @@ public class Client implements Runnable
         }
         catch (UnknownHostException exception)
         {
-            Log(Level.SEVERE, "Host not valid: " + exception.getMessage());
+            Log(Level.ERROR, "Host not valid: " + exception.getMessage());
             throw new RuntimeException(exception);
         }
     }
@@ -58,11 +50,11 @@ public class Client implements Runnable
             SendPacket(Protocol.READY_REQUEST);
             IsWaitingReadyResponse = true;
             ThisThead.start();
-            Log("Socket connected! Waiting server accept...");
+            LogInfo("Socket connected! Waiting server accept...");
         }
         catch (Exception exception)
         {
-            Log(Level.SEVERE, "Connect exception: " + exception.getMessage());
+            Log(Level.ERROR, "Connect exception: " + exception.getMessage());
         }
     }
 
@@ -81,7 +73,7 @@ public class Client implements Runnable
         }
         catch (Exception disconnectException)
         {
-            Log(Level.SEVERE, "Disconnect exception: " + disconnectException);
+            Log(Level.DEBUG, "Disconnect exception: " + disconnectException);
             disconnectException.printStackTrace();
         }
     }
@@ -108,18 +100,15 @@ public class Client implements Runnable
         if (SocketClient.isClosed() || IsWaitingReadyResponse)
             throw new RuntimeException("Socket closed!");
 
-        Log("Sending: " + message);
+        Log(Level.DEBUG, "Sending: " + message);
         Printer.println(message);
     }
 
-    private void Log(String message) { Log(Level.INFO, message); }
+    private void LogInfo(String message) { Log(Level.INFO, message); }
 
     private void Log(Level level, String message)
     {
-        if (Logger != null)
-        {
-            Logger.log(level, message);
-        }
+        Interface.Log(level, message);
     }
 
     @Override
@@ -130,29 +119,29 @@ public class Client implements Runnable
             String Line;
             while ((Line = Receiver.readLine()) != null)
             {
-                Log("Received: " + Line);
+                Log(Level.DEBUG, "Received: " + Line);
                 String Token = ServerUtilities.GetToken(Line);
 
-                Log("Message token: " + Token);
+                Log(Level.DEBUG, "Message token: " + Token);
 
                 if (Interface.IsValidToken(Token))
                 {
                     String MessageWithOutProtocol = ServerUtilities.GetMessageWithOutProtocol(Line);
                     Protocol Packet = ServerUtilities.GetPacket(Line);
-                    Log("Packet: " + Packet);
-                    Log("Server name: " + ServerUtilities.GetName(Line));
-                    Log("MessageWithOutProtocol: " + MessageWithOutProtocol);
+                    Log(Level.DEBUG, "Packet: " + Packet);
+                    Log(Level.DEBUG, "Server name: " + ServerUtilities.GetName(Line));
+                    Log(Level.DEBUG, "MessageWithOutProtocol: " + MessageWithOutProtocol);
                     if (Interface.getServerName().equalsIgnoreCase(ServerUtilities.GetName(Line)))
                     {
                         if (Packet == Protocol.READY_ACCEPT && IsWaitingReadyResponse)
                         {
-                            Log("The server accepted the connection!");
+                            Log(Level.INFO, "The server accepted the connection!");
                             IsWaitingReadyResponse = false;
                             continue;
                         }
                         if (Packet == Protocol.READY_REJECT && IsWaitingReadyResponse)
                         {
-                            Log(Level.SEVERE, "The server rejected the connection!");
+                            Log(Level.WARN, "The server rejected the connection!");
                             Stop();
                             continue;
                         }
@@ -160,7 +149,7 @@ public class Client implements Runnable
                             switch (Packet) {
                                 case DISABLE_RESPONSE ->
                                 {
-                                    Log("The server accepted disabling!");
+                                    Log(Level.DEBUG, "The server accepted disabling!");
                                     Stop();
                                 }
                                 case KEEPALIVE_RESPONSE ->
@@ -170,7 +159,7 @@ public class Client implements Runnable
                                 }
                                 case TRASH ->
                                 {
-                                    Log(Level.SEVERE, "Мусор или ошибка в протоколе! Выключаюсь!");
+                                    Log(Level.INFO, "Garbage or an error in the protocol! Im turning off!");
                                     Stop();
                                 }
                                 case USER_PACKET -> Interface.OnMessage(MessageWithOutProtocol);
@@ -182,7 +171,7 @@ public class Client implements Runnable
         }
         catch (Exception exception)
         {
-            Log(Level.SEVERE, "Read error: " + exception.getMessage());
+            Log(Level.ERROR, "Read error: " + exception.getMessage());
             exception.printStackTrace();
         }
 

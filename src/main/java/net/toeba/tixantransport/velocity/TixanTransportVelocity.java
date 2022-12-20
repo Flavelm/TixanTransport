@@ -35,6 +35,7 @@ public class TixanTransportVelocity
     private static final Queue<Map.Entry<String, String>> Commands = new Queue<>();
     private List<String> Tokens;
     private final String ProxyName = "Proxy";
+    private final boolean Debug = true;
 
     @Subscribe
     private void OnEnable(ProxyInitializeEvent event)
@@ -50,7 +51,7 @@ public class TixanTransportVelocity
         //public Server(String ip, int backlog, int timeOut, ClientHandlerInterface handlerInterface, Logger logger)
         this.Server = new Server("0.0.0.0:5001", 50, Interface, Logger);
         this.Server.Start();
-        this.PServer.getScheduler().buildTask(this, Sender).repeat(100, TimeUnit.MILLISECONDS);
+        this.PServer.getScheduler().buildTask(this, Sender).repeat(100, TimeUnit.MILLISECONDS).schedule();
     }
 
     @Subscribe
@@ -122,8 +123,13 @@ public class TixanTransportVelocity
         }
 
         @Override
-        public void Log(String info)
+        public void Log(String info, boolean debug)
         {
+            if (debug && Debug)
+            {
+                Logger.debug(info);
+                return;
+            }
             Logger.info(info);
         }
     };

@@ -44,7 +44,7 @@ public class ClientHandler implements Runnable
     @Override
     protected void finalize()
     {
-        HandlerInterface.Log("Connection deleted!");
+        HandlerInterface.Log("Connection deleted!", false);
     }
 
     private void Handle(String message)
@@ -52,19 +52,19 @@ public class ClientHandler implements Runnable
         String[] Message = message.split(Constants.RequestSeparator);
         if (Message.length < 3) { Stop(); }
         String Token = ServerUtilities.GetToken(message);
-        HandlerInterface.Log("Message: " + message);
-        HandlerInterface.Log("Token: " + Token);
+        HandlerInterface.Log("Message: " + message, true);
+        HandlerInterface.Log("Token: " + Token, true);
         if (HandlerInterface.IsValidToken(Token))
         {
             Protocol Packet = ServerUtilities.GetPacket(message);
             String Name = ServerUtilities.GetName(message);
             if (Packet == null || Name == null) { Stop(); return; }
-            HandlerInterface.Log("ClientName: " + Name);
-            HandlerInterface.Log("Packet: " + Packet);
+            HandlerInterface.Log("ClientName: " + Name, true);
+            HandlerInterface.Log("Packet: " + Packet, true);
             ClientToken = Token;
             if (Packet == Protocol.TRASH)
             {
-                HandlerInterface.Log("TRASH");
+                HandlerInterface.Log("TRASH", true);
                 Stop();
             }
             if (HandlerInterface.IsValidServer(Name))
@@ -88,14 +88,14 @@ public class ClientHandler implements Runnable
                         Stop();
                         break;
                     case USER_PACKET:
-                        HandlerInterface.Log("HandlerInterface.OnMassage(Message[2], Name);");
+                        HandlerInterface.Log("OnMessage(message, Name);", true);
                         HandlerInterface.OnMessage(ServerUtilities.GetMessageWithOutProtocol(message), Name);
                         break;
                 }
             }
             else
             {
-                HandlerInterface.Log("Invalid client name! Disconnect");
+                HandlerInterface.Log("Invalid client name! Disconnect", false);
                 Stop();
             }
         }
@@ -110,7 +110,7 @@ public class ClientHandler implements Runnable
             this.Printer.close();
             ThisThread.interrupt();
             HandlerInterface.OnDisable(ServerName, this);
-            HandlerInterface.Log("Client Disconnect");
+            HandlerInterface.Log("Client Disconnect", false);
         }
         catch (IOException ignored) {  }
     }
@@ -148,7 +148,7 @@ public class ClientHandler implements Runnable
         if (Client.isClosed())
             throw new RuntimeException("Socket closed");
 
-        HandlerInterface.Log("Sending: " + message);
+        HandlerInterface.Log("Sending: " + message, true);
         Printer.println(message);
     }
 
@@ -167,7 +167,7 @@ public class ClientHandler implements Runnable
         }
         catch (IOException e)
         {
-            HandlerInterface.Log("Client already disconnected!!!");
+            HandlerInterface.Log("Client already disconnected!!!", true);
         }
     }
 }

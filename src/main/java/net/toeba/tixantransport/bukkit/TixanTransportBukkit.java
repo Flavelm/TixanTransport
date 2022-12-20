@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.apache.logging.log4j.Level;
 
 import java.util.Map;
 import java.util.logging.Logger;
@@ -19,8 +20,11 @@ public class TixanTransportBukkit extends JavaPlugin
 {
     private static Queue<Map.Entry<Plugin, String>> CommandsQueue;
     private final Logger Logger = getLogger();
+    private final org.apache.logging.log4j.Logger Log4J;
     private Client NetworkClient;
     private Config Config;
+
+    public TixanTransportBukkit() { Log4J = org.apache.logging.log4j.LogManager.getLogger(getName()); }
 
     @Override
     public void onLoad()
@@ -40,7 +44,7 @@ public class TixanTransportBukkit extends JavaPlugin
 
         Logger.info(Config.IP + " " + Config.Port + " " + Config.ServerName);
 
-        NetworkClient = new Client(Config.IP, Config.Port, Config.ServerName, ClientHandler, getLogger());
+        NetworkClient = new Client(Config.IP, Config.Port, Config.ServerName, ClientHandler);
         CommandsQueue = new Queue<>();
         NetworkClient.Start();
 
@@ -94,11 +98,12 @@ public class TixanTransportBukkit extends JavaPlugin
     {
         @Override public boolean IsValidToken(String Token) { return Token.equalsIgnoreCase(Config.Token); }
         @Override public void OnMessage(String message) { EventFire(message); }
+        @Override public void Log(Level level, String info) { Log4J.log(level, info); }
         @Override public String getToken() { return Config.Token; }
         @Override public String getServerName() { return Config.ProxyName; }
     };
 
-    private final EventInterface EventInterface1 = (plugin, message) -> { CommandsQueue.Add(Map.entry(plugin, message)); };
+    private final EventInterface EventInterface1 = (plugin, message) -> CommandsQueue.Add(Map.entry(plugin, message));
 
     private void EventFire(String message)
     {

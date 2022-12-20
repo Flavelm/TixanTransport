@@ -8,5 +8,5 @@ public interface ClientHandlerInterface
     boolean IsValidToken(String token);
     boolean IsValidServer(String serverName);
     String getProxyName();
-    void Log(String info);
+    void Log(String info, boolean debug);
 }
