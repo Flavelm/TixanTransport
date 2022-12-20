@@ -44,5 +44,5 @@ For example: synchronization of configs, protection from entering the backend, c
       - [ ] Packet type
 - [ ] Log
   - [X] Info
-  - [ ] Debug
+  - [X] Debug
 
