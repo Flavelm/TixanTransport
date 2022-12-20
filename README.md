@@ -42,7 +42,7 @@ For example: synchronization of configs, protection from entering the backend, c
       - [X] Message
       - [X] Response
       - [ ] Packet type
-- [ ] Log
+- [X] Log
   - [X] Info
   - [X] Debug
 
